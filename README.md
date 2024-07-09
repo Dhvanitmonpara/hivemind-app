@@ -1,1 +1,1 @@
-# Clip-sync
+# Hive-Mind app
