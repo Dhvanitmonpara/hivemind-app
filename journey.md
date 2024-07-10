@@ -5,4 +5,5 @@ refer: [How to setup a professional backend project](https://youtu.be/9B4CvtzXRp
 
 # 10/7/2024
 
-Basic express and Utils setup.
+Basic express and Utils setup. User.js and Video.js model setup using bcrypt, JWT and mongoose aggregation.
+refer: [Custom api response and error handling](https://youtu.be/S5EpsMjel-M?si=SGoU99CDh2-enDq-) and [User and Video model hooks with JWT](https://youtu.be/S5EpsMjel-M?si=SGoU99CDh2-enDq-).
