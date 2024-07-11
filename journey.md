@@ -7,3 +7,8 @@ refer: [How to setup a professional backend project](https://youtu.be/9B4CvtzXRp
 
 Basic express and Utils setup. User.js and Video.js model setup using bcrypt, JWT and mongoose aggregation.
 refer: [Custom api response and error handling](https://youtu.be/S5EpsMjel-M?si=SGoU99CDh2-enDq-) and [User and Video model hooks with JWT](https://youtu.be/S5EpsMjel-M?si=SGoU99CDh2-enDq-).
+
+# 11/7/24
+
+File upload setup using Cloudinary and multer.
+refer: [How to upload file using multer](Cloudinary and multer )
