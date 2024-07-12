@@ -12,3 +12,8 @@ refer: [Custom api response and error handling](https://youtu.be/S5EpsMjel-M?si=
 
 File upload setup using Cloudinary and multer.
 refer: [How to upload file using multer](Cloudinary and multer )
+
+# 12/7/24
+
+Created router and register controller.
+refer: [Complete guide for router and controller with debugging](https://youtu.be/HqcGLJSORaA?si=iy1U6pvekdwPjKwj) and [Register controller](https://youtu.be/VKXnSwNm_lE?si=PGPs3nY2R01WXZwv).
