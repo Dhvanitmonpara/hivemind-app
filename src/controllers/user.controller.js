@@ -176,36 +176,36 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
         throw new ApiError(401, "Unauthorized request")
     }
 
-   try {
-     const decodedToken = jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET)
- 
-     const user = await User.findById(decodedToken?._id)
- 
-     if (!user) {
-         throw new ApiError(401, "Invalid Refresh Token")
-     }
- 
-     if (incomingRefreshToken !== user?.refreshToken) {
-         throw new ApiError(401, "Refresh Token is expired or used")
-     }
- 
-     const { accessToken, newRefreshToken } = await generateAccessAndRefreshToken(user._id)
- 
-     return res
-         .status(200)
-         .cookie("accessToken", accessToken, options)
-         .cookie("refreshToken", newRefreshToken, options)
-         .json(new ApiResponse(
-             200,
-             {
-                 accessToken,
-                 refreshToken: newRefreshToken
-             },
-             "Access Token refreshed"
-         ))
-   } catch (error) {
+    try {
+        const decodedToken = jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET)
+
+        const user = await User.findById(decodedToken?._id)
+
+        if (!user) {
+            throw new ApiError(401, "Invalid Refresh Token")
+        }
+
+        if (incomingRefreshToken !== user?.refreshToken) {
+            throw new ApiError(401, "Refresh Token is expired or used")
+        }
+
+        const { accessToken, newRefreshToken } = await generateAccessAndRefreshToken(user._id)
+
+        return res
+            .status(200)
+            .cookie("accessToken", accessToken, options)
+            .cookie("refreshToken", newRefreshToken, options)
+            .json(new ApiResponse(
+                200,
+                {
+                    accessToken,
+                    refreshToken: newRefreshToken
+                },
+                "Access Token refreshed"
+            ))
+    } catch (error) {
         throw new ApiError(401, error?.message || "Invalid Refresh token")
-   }
+    }
 })
 
 export { registerUser, loginUser, logoutUser, refreshAccessToken }
