@@ -297,11 +297,11 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
 
     return res
         .status(200)
-        .json(
+        .json(new ApiResponse(
             200,
             user,
             "Avatar updated successfully"
-        )
+        ))
 })
 
 const updateUserCoverImage = asyncHandler(async (req, res) => {
@@ -332,11 +332,11 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
 
     return res
         .status(200)
-        .json(
+        .json(new ApiResponse(
             200,
             user,
             "Cover image updated successfully"
-        )
+        ))
 })
 
 export {
