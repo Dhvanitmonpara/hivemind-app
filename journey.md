@@ -17,3 +17,8 @@ refer: [How to upload file using multer](Cloudinary and multer )
 
 Created router, register controller, Access and refresh token.
 refer: [Complete guide for router and controller with debugging](https://youtu.be/HqcGLJSORaA?si=iy1U6pvekdwPjKwj), [Register controller](https://youtu.be/VKXnSwNm_lE?si=PGPs3nY2R01WXZwv), [Access Refresh Token, Middleware and cookies in backend](https://youtu.be/7DVpag3cO0g?si=E-5MjknfWXHzj98X) and [Access and Refresh Token in backend](https://youtu.be/L2_gIrDxCes?si=ZjmK00uk-qMMxCZx).
+
+# 13/7/24
+
+Created more controllers for updating user profile details.
+refer: [Writing update controllers for user](https://youtu.be/9azRerL6CZc?si=9EVdmOhYyyZfOegh)
