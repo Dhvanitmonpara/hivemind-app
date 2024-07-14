@@ -24,3 +24,4 @@ Created more controllers for updating user profile details.
 refer: [Writing update controllers for user](https://youtu.be/9azRerL6CZc?si=9EVdmOhYyyZfOegh), [Learn mongoDB aggregation pipeline](https://youtu.be/fDTf1mk-jQg?si=jgW9Y7BhuGMtRwZD) and [How to write sub pipelines and routes](https://youtu.be/qNnR7cuVliI?si=7BtnHCbgZnSIyZz2).
 
 - [Summary of the series](https://youtu.be/VUgl3i8DdW4?si=ktrD8d5OsS6yZYUF)
+- [Github link](https://github.com/hiteshchoudhary/chai-backend)
