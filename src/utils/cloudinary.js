@@ -23,4 +23,9 @@ const uploadOnCloudinary = async (localFilePath) => {
     }
 }
 
-export { uploadOnCloudinary }
+const deleteFromCloudinary = async (publicId) => {
+    const response = await cloudinary.uploader.destroy(publicId, response => response)
+    return response
+}
+
+export { uploadOnCloudinary, deleteFromCloudinary }
