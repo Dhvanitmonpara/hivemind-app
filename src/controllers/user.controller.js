@@ -234,11 +234,11 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
 const getCurrentUser = asyncHandler(async (req, res) => {
     return res
         .status(200)
-        .json(
+        .json(new ApiResponse(
             200,
             req.user,
             "Current user fetched successfully"
-        )
+        ))
 })
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
@@ -382,8 +382,8 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
                     $size: "$subscribedTo"
                 },
                 isSubscribed: {
-                    $condition: {
-                        if: { $in: [req.user?._id, "$subscribers.subscriber"] },
+                    $cond: {
+                        if: {$in: [req.user?._id, "$subscribers.subscriber"]},
                         then: true,
                         else: false
                     }
@@ -400,6 +400,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
                 avatar: 1,
                 coverImage: 1,
                 email: 1
+
             }
         }
     ])
@@ -420,10 +421,10 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
 
 const getWatchHistory = asyncHandler(async (req, res) => {
 
-    const user = User.aggregate([
+    const user = await User.aggregate([
         {
             $match: {
-                _id: new mongoose.Types.ObjectId.createFromHexString(req.user._id)
+                _id: new mongoose.Types.ObjectId(req.user._id)
             }
         },
         {
@@ -443,26 +444,26 @@ const getWatchHistory = asyncHandler(async (req, res) => {
                                 {
                                     $project: {
                                         fullName: 1,
-                                        avatar: 1,
-                                        username: 1
+                                        username: 1,
+                                        avatar: 1
                                     }
                                 }
                             ]
                         }
                     },
                     {
-                        $addFields: {
-                            owner: {
+                        $addFields:{
+                            owner:{
                                 $first: "$owner"
                             }
                         }
                     }
                 ]
             }
-        },
+        }
     ])
 
-    if(!user){
+    if (!user) {
         throw new ApiError(401, "Some error occurred while fetching watch history")
     }
 
