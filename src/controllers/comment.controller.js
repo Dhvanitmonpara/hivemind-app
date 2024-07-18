@@ -6,7 +6,8 @@ import { ApiResponse } from "../utils/ApiResponse.js"
 import { asyncHandler } from "../utils/asyncHandler.js"
 
 const getVideoComments = asyncHandler(async (req, res) => {
-    //TODO: get all comments for a video
+    // get all comments for a video
+
     // get videoId from request params
     // request comments from database with pagination
 
@@ -34,7 +35,8 @@ const getVideoComments = asyncHandler(async (req, res) => {
 })
 
 const addComment = asyncHandler(async (req, res) => {
-    // TODO: add a comment to a video
+    // add a comment to a video
+
     // get content from request body
     // check if content is valid
     // create new comment in database
@@ -70,7 +72,8 @@ const addComment = asyncHandler(async (req, res) => {
 })
 
 const updateComment = asyncHandler(async (req, res) => {
-    // TODO: update a comment
+    // update a comment
+
     // get commentId from request params
     // get content from request body
     // check if content is valid
@@ -105,7 +108,8 @@ const updateComment = asyncHandler(async (req, res) => {
 })
 
 const deleteComment = asyncHandler(async (req, res) => {
-    // TODO: delete a comment
+    // delete a comment
+
     // get commentId from request params
     // delete comment from database
     // update video's comment count

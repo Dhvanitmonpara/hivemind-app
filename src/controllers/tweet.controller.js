@@ -57,7 +57,8 @@ const getUserTweets = asyncHandler(async (req, res) => {
 })
 
 const updateTweet = asyncHandler(async (req, res) => {
-    //TODO: update tweet
+    // update tweet
+
     // get tweet id from request params
     // get data from request body
     // check if tweet text is valid
@@ -96,7 +97,8 @@ const updateTweet = asyncHandler(async (req, res) => {
 })
 
 const deleteTweet = asyncHandler(async (req, res) => {
-    //TODO: delete tweet
+    // delete tweet
+    
     // get tweet id from request params
     // delete tweet from database
     // return response with deleted tweet data

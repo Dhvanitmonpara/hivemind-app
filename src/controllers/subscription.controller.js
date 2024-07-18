@@ -8,7 +8,7 @@ import { asyncHandler } from "../utils/asyncHandler.js"
 
 const toggleSubscription = asyncHandler(async (req, res) => {
     const { channelId } = req.params
-    // TODO: toggle subscription
+    // toggle subscription
 
     if (!channelId) {
         throw new ApiError(400, "Channel ID is required")
@@ -31,7 +31,7 @@ const toggleSubscription = asyncHandler(async (req, res) => {
         channel: channel._id
     })
 
-    // TODO: check if query works as expected
+    // check if query works as expected
     if (!isSubscribed) {
         const subscription = new Subscription({
             user: user._id,
