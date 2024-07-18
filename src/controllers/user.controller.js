@@ -284,27 +284,38 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Error while uploading on avatar")
     }
 
-    
+    // deleting avatar from cloudinary
+
+    const avatarQueryArray = req.user.avatar.split('/');
+    const avatarNameWithExtension = avatarQueryArray[avatarQueryArray.length - 1];
+    const avatarName = avatarNameWithExtension.split('.')[0];
+
+    if (!avatarName) {
+        throw new ApiError(500, "Error while extracting image name from avatar URL",)
+    }
+
+    const response = await deleteFromCloudinary(avatarName, (error) => {
+        if (error) {
+            throw new ApiError(500, `Error while deleting old avatar from cloudinary: ${error.message}`)
+        }
+    })
+
+    // updating user in the database
+
     const user = await User.findByIdAndUpdate(
         req.user._id,
         { $set: { avatar: avatar.url } },
         { new: true, select: "-password -refreshToken" }
     );
-    
-    // TODO: Delete document from cloudinary
-    try {
-        const oldAvatarUrl = req.user.avatar;
-        const response = await deleteFromCloudinary(oldAvatarUrl)
-        console.log(response)
-    } catch (error) {
-        throw new ApiError(500, `Error while deleting old avatar from cloudinary: ${error.message}`,)
-    }
 
     return res
         .status(200)
         .json(new ApiResponse(
             200,
-            user,
+            {
+                user,
+                deletionResponse: response
+            },
             "Avatar updated successfully"
         ))
 })
@@ -323,7 +334,23 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Error while uploading on cover image")
     }
 
-    // TODO: Delete document from cloudinary
+    // deleting cover image from cloudinary
+
+    const coverImageQueryArray = req.user.coverImage.split('/');
+    const coverImageNameWithExtension = coverImageQueryArray[coverImageQueryArray.length - 1];
+    const coverImageName = coverImageNameWithExtension.split('.')[0];
+
+    if (!coverImageName) {
+        throw new ApiError(500, "Error while extracting image name from avatar URL",)
+    }
+
+    const response = await deleteFromCloudinary(coverImageName, (error) => {
+        if (error) {
+            throw new ApiError(500, `Error while deleting old avatar from cloudinary: ${error.message}`)
+        }
+    })
+
+    // updating user in the database
 
     const user = await User.findByIdAndUpdate(
         req.user._id,
@@ -341,7 +368,10 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
         .status(200)
         .json(new ApiResponse(
             200,
-            user,
+            {
+                user,
+                deletionResponse: response
+            },
             "Cover image updated successfully"
         ))
 })
