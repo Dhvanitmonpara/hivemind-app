@@ -294,11 +294,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
         throw new ApiError(500, "Error while extracting image name from avatar URL",)
     }
 
-    const response = await deleteFromCloudinary(avatarName, (error) => {
-        if (error) {
-            throw new ApiError(500, `Error while deleting old avatar from cloudinary: ${error.message}`)
-        }
-    })
+    const response = await deleteFromCloudinary(avatarName)
 
     // updating user in the database
 
@@ -341,14 +337,10 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
     const coverImageName = coverImageNameWithExtension.split('.')[0];
 
     if (!coverImageName) {
-        throw new ApiError(500, "Error while extracting image name from avatar URL",)
+        throw new ApiError(500, "Error while extracting image name from image URL",)
     }
 
-    const response = await deleteFromCloudinary(coverImageName, (error) => {
-        if (error) {
-            throw new ApiError(500, `Error while deleting old avatar from cloudinary: ${error.message}`)
-        }
-    })
+    const response = await deleteFromCloudinary(coverImageName)
 
     // updating user in the database
 
