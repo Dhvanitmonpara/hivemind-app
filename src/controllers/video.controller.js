@@ -10,6 +10,52 @@ import { uploadOnCloudinary, deleteFromCloudinary } from "../utils/cloudinary.js
 const getAllVideos = asyncHandler(async (req, res) => {
     const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
     //TODO: get all videos based on query, sort, pagination
+
+    const validSortFields = ["createdAt", "title"];
+    const validSortTypes = ["asc", "desc"];
+
+    if (sortBy && !validSortFields.includes(sortBy)) {
+        throw new ApiError(400, "Invalid sort field")
+    }
+
+    if (sortType && !validSortTypes.includes(sortType)) {
+        throw new ApiError(400, "Invalid sort type")
+    }
+
+    if (userId && !isValidObjectId(userId)) {
+        throw new ApiError(400, "Invalid user ID")
+    }
+
+
+    const queryObj = query
+        ? {
+            title: {
+                $regex: new RegExp(
+                    query
+                        .replace(/[-\/\\^$*+?.()|[\]{}]/g, " ")
+                        .split(" ")
+                        .join("|"),
+                    "i"
+                ),
+            },
+        }
+        : {};
+
+    const videos = await Video
+        .find(queryObj)
+        .sort({ createdAt: -1 })
+        .limit(limit * 1)
+        .skip((page - 1) * limit)
+        .populate("owner", "fullname username  avatar coverImage");
+
+    return res
+        .status(200)
+        .json(new ApiResponse(
+            200,
+            videos,
+            "Videos retrieved successfully"
+        ));
+
 })
 
 const publishAVideo = asyncHandler(async (req, res) => {
