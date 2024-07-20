@@ -205,6 +205,9 @@ const getVideoById = asyncHandler(async (req, res) => {
 })
 
 const updateVideo = asyncHandler(async (req, res) => {
+
+    // FIXME: thumbnail is not updating
+
     const { videoId } = req.params
 
     if (!videoId) {
@@ -280,7 +283,7 @@ const deleteVideo = asyncHandler(async (req, res) => {
 
     const deletedVideoId = getPublicId(deletedVideo.videoFile)
 
-    if(!deletedVideoId){
+    if (!deletedVideoId) {
         throw new ApiError(500, "Failed to retrieve video Id")
     }
 
@@ -288,7 +291,7 @@ const deleteVideo = asyncHandler(async (req, res) => {
 
     const deletedThumbnailId = getPublicId(deletedVideo.thumbnail)
 
-    if(!deletedThumbnailId){
+    if (!deletedThumbnailId) {
         throw new ApiError(500, "Failed to retrieve thumbnail Id")
     }
 
@@ -314,11 +317,24 @@ const togglePublishStatus = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Video ID is required")
     }
 
-    const video = await Video.findByIdAndUpdate(videoId,
+    const authenticatedId = req.user?._id;
+
+    const { isPublished } = req.body;
+
+    console.log(req.body)
+
+    console.log(isPublished)
+
+    const video = await Video.findByIdAndUpdate(
         {
-            isPublished: !req.video.isPublished,
+            _id: videoId,
+            owner: authenticatedId
         },
-        { new: true })
+        {
+            isPublished: !isPublished
+        },
+        { new: true }
+    );
 
     if (!video) {
         throw new ApiError(404, "Video not found")
