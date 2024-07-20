@@ -5,6 +5,7 @@ import { ApiError } from "../utils/ApiError.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import { asyncHandler } from "../utils/asyncHandler.js"
 import { uploadOnCloudinary, deleteFromCloudinary } from "../utils/cloudinary.js"
+import getPublicId from "../utils/getPublicId.js"
 
 
 const getAllVideos = asyncHandler(async (req, res) => {
@@ -112,15 +113,85 @@ const publishAVideo = asyncHandler(async (req, res) => {
 
 const getVideoById = asyncHandler(async (req, res) => {
     const { videoId } = req.params
+    const user = req.user
     // get video by id
 
     if (!videoId) {
         throw new ApiError(400, "Video ID is required")
     }
 
-    const video = await Video.findById(videoId)
+    const videoDetails = await Video.aggregate([
+        { $match: { _id: new mongoose.Types.ObjectId(videoId) } },
+        {
+            $lookup: {
+                from: "users",
+                localField: "owner",
+                foreignField: "_id",
+                as: "owner",
+            },
+        },
+        {
+            $lookup: {
+                from: "subscriptions",
+                localField: "owner._id",
+                foreignField: "channel",
+                as: "subscribers",
+            },
+        },
+        {
+            $lookup: {
+                from: "likes",
+                localField: "_id",
+                foreignField: "video",
+                as: "likes",
+            },
+        },
+        {
+            $addFields: {
+                owner: { $arrayElemAt: ["$owner", 0] },
+                likesCount: { $size: { $ifNull: ["$likes", []] } },
+                subscribersCount: { $size: { $ifNull: ["$subscribers", []] } },
+                isSubscribed: {
+                    $cond: {
+                        if: { $in: [user?._id, "$subscribers.subscriber"] },
+                        then: true,
+                        else: false,
+                    },
+                },
+                isLiked: {
+                    $cond: {
+                        if: { $in: [user?._id, "$likes.likedBy"] },
+                        then: true,
+                        else: false,
+                    },
+                },
+            },
+        },
+        {
+            $project: {
+                title: 1,
+                description: 1,
+                thumbnail: 1,
+                videoFile: 1,
+                owner: {
+                    _id: 1,
+                    fullName: 1,
+                    username: 1,
+                    avatar: 1,
+                },
+                isSubscribed: 1,
+                isLiked: 1,
+                likesCount: 1,
+                subscribersCount: 1,
+                createdAt: 1,
+                views: 1,
+                isPublished: 1,
+                duration: 1,
+            },
+        },
+    ]);
 
-    if (!video) {
+    if (videoDetails.length === 0) {
         throw new ApiError(404, "Video not found")
     }
 
@@ -128,10 +199,9 @@ const getVideoById = asyncHandler(async (req, res) => {
         .status(200)
         .json(new ApiResponse(
             200,
-            video,
+            videoDetails[0],
             "Video retrieved successfully"
-        ))
-
+        ));
 })
 
 const updateVideo = asyncHandler(async (req, res) => {
@@ -196,21 +266,42 @@ const updateVideo = asyncHandler(async (req, res) => {
 
 const deleteVideo = asyncHandler(async (req, res) => {
     const { videoId } = req.params
-    //TODO: delete video
+    // delete video
 
     if (!videoId) {
         throw new ApiError(400, "Video ID is required")
     }
 
-    console.log(videoId)
+    const deletedVideo = await Video.findByIdAndDelete({ _id: videoId, owner: req.user?._id })
 
-    const response = await deleteFromCloudinary(videoId)
+    if (!deletedVideo || !deletedVideo.videoFile) {
+        throw new ApiError(404, "Video not found")
+    }
+
+    const deletedVideoId = getPublicId(deletedVideo.videoFile)
+
+    if(!deletedVideoId){
+        throw new ApiError(500, "Failed to retrieve video Id")
+    }
+
+    const videoResponse = await deleteFromCloudinary(deletedVideoId, "video")
+
+    const deletedThumbnailId = getPublicId(deletedVideo.thumbnail)
+
+    if(!deletedThumbnailId){
+        throw new ApiError(500, "Failed to retrieve thumbnail Id")
+    }
+
+    const thumbnailResponse = await deleteFromCloudinary(deletedThumbnailId, "image")
 
     return res
         .status(200)
         .json(new ApiResponse(
             200,
-            response,
+            {
+                videoResponse,
+                thumbnailResponse
+            },
             "Video deleted successfully"
         ))
 

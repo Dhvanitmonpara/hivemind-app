@@ -5,6 +5,7 @@ import { deleteFromCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js
 import { ApiResponse } from "../utils/ApiResponse.js"
 import jwt from "jsonwebtoken"
 import mongoose from "mongoose"
+import getPublicId from "../utils/getPublicId.js"
 
 const options = {
     httpOnly: true,
@@ -286,9 +287,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
 
     // deleting avatar from cloudinary
 
-    const avatarQueryArray = req.user.avatar.split('/');
-    const avatarNameWithExtension = avatarQueryArray[avatarQueryArray.length - 1];
-    const avatarName = avatarNameWithExtension.split('.')[0];
+    const avatarName = getPublicId(req.user.avatar)
 
     if (!avatarName) {
         throw new ApiError(500, "Error while extracting image name from avatar URL",)
@@ -332,9 +331,7 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
 
     // deleting cover image from cloudinary
 
-    const coverImageQueryArray = req.user.coverImage.split('/');
-    const coverImageNameWithExtension = coverImageQueryArray[coverImageQueryArray.length - 1];
-    const coverImageName = coverImageNameWithExtension.split('.')[0];
+    const coverImageName = getPublicId(req.user.coverImage)
 
     if (!coverImageName) {
         throw new ApiError(500, "Error while extracting image name from image URL",)
