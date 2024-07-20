@@ -225,9 +225,11 @@ const updateVideo = asyncHandler(async (req, res) => {
 
         const rawThumbnailOldPath = await Video.findById(videoId).select("thumbnail").lean()
 
-        const thumbnailOldPath = await getPublicId(rawThumbnailOldPath.thumbnail)
+        if(!rawThumbnailOldPath){
+            throw new ApiError(404, "thumbnail not found")
+        }
 
-        console.log(thumbnailOldPath)
+        const thumbnailOldPath = await getPublicId(rawThumbnailOldPath.thumbnail)
 
         if (thumbnailOldPath) {
             await deleteFromCloudinary(thumbnailOldPath, "image")
