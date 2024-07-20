@@ -8,11 +8,11 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
     const { videoId } = req.params
     // toggle like on video
 
-    const existingLike = await Like.findOne({ videoId, userId: req.user._id })
+    const existingLike = await Like.findOne({ video: videoId, likedBy: req.user._id })
     if (existingLike) {
-        await existingLike.remove()
+        await Like.deleteOne(existingLike._id)
     } else {
-        await Like.create({ videoId, userId: req.user._id })
+        await Like.create({ video: videoId, likedBy: req.user._id })
     }
 
     return res
@@ -28,11 +28,19 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
     const { commentId } = req.params
     // toggle like on comment
 
-    const existingLike = await Like.findOne({ commentId, userId: req.user._id })
+    const existingLike = await Like.findOne({ comment: commentId, likedBy: req.user._id })
+
     if (existingLike) {
-        await existingLike.remove()
+
+        await Like.deleteOne(existingLike._id)
+
     } else {
-        await Like.create({ commentId, userId: req.user._id })
+
+        await Like.create({
+            comment: commentId,
+            likedBy: req.user._id,
+        })
+
     }
 
     return res
@@ -48,11 +56,11 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
     const { tweetId } = req.params
     // toggle like on tweet
 
-    const existingLike = await Like.findOne({ tweetId, userId: req.user._id })
+    const existingLike = await Like.findOne({ tweet: tweetId, likedBy: req.user._id })
     if (existingLike) {
-        await existingLike.remove()
+        await Like.deleteOne(existingLike._id)
     } else {
-        await Like.create({ tweetId, userId: req.user._id })
+        await Like.create({ tweet: tweetId, likedBy: req.user._id })
     }
 
     return res
@@ -67,10 +75,10 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
 const getLikedVideos = asyncHandler(async (req, res) => {
     // get all liked videos
 
-    const likes = await Like.find({ 
-        userId: req.user._id 
+    const likes = await Like.find({
+        likedBy: req.user._id
     }).populate(
-        "videoId", 
+        "video",
         "title description"
     )
 

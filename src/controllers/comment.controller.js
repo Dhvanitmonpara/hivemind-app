@@ -14,13 +14,17 @@ const getVideoComments = asyncHandler(async (req, res) => {
     const { videoId } = req.params
     const { page = 1, limit = 10 } = req.query
 
-    if(!videoId) {
+    if (!videoId) {
         throw new ApiError(404, "Video not found")
     }
 
-    const comments = await Comment.findMany({ video: videoId })
+    const comments = await Comment
+        .find({ video: videoId })
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(parseInt)
 
-    if(!comments) {
+    if (!comments) {
         throw new ApiError(404, "Comments not found")
     }
 
