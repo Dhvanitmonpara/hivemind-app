@@ -6,7 +6,7 @@ import { ApiResponse } from "../utils/ApiResponse.js"
 import { asyncHandler } from "../utils/asyncHandler.js"
 
 const createTweet = asyncHandler(async (req, res) => {
-    //TODO: create tweet
+    // create tweet
     // get data from request body
     // check if tweet text is valid
     // create new tweet in database
@@ -19,7 +19,7 @@ const createTweet = asyncHandler(async (req, res) => {
     }
 
     const tweet = await Tweet.create({
-        owner: new mongoose.Types.ObjectId(req.user?._id),
+        owner: req.user._id,
         content
     })
 

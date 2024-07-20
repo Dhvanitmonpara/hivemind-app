@@ -14,12 +14,6 @@ const toggleSubscription = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Channel ID is required")
     }
 
-    const user = await User.findById(req.user.id)
-
-    if (!user) {
-        throw new ApiError(401, "User not found")
-    }
-
     const channel = await User.findById(channelId)
 
     if (!channel) {
@@ -27,18 +21,15 @@ const toggleSubscription = asyncHandler(async (req, res) => {
     }
 
     const isSubscribed = await Subscription.findOne({
-        user: user._id,
+        subscriber: req.user._id,
         channel: channel._id
     })
 
-    // check if query works as expected
     if (!isSubscribed) {
-        const subscription = new Subscription({
-            user: user._id,
-            channel: channel._id
+        const subscription = await Subscription.create({
+            subscriber: req.user._id,
+            channel: channel._id,
         })
-
-        await subscription.save()
 
         return res.status(201).json(new ApiResponse(
             200,
@@ -63,15 +54,15 @@ const toggleSubscription = asyncHandler(async (req, res) => {
 
 // controller to return subscriber list of a channel
 const getUserChannelSubscribers = asyncHandler(async (req, res) => {
-    const { channelId } = req.params
+    const { subscriberId } = req.params
 
-    if (!channelId) {
+    if (!subscriberId) {
         throw new ApiError(400, "Channel ID is required")
     }
 
-    const subscribers = await Subscription.findMany({ channel: channelId })
+    const subscribers = await Subscription.find({ subscriber: subscriberId })
 
-    if (!subscribers) {
+    if (!subscribers || subscribers.length === 0) {
         throw new ApiError(404, "No subscribers found")
     }
 
@@ -87,21 +78,15 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
 
 // controller to return channel list to which user has subscribed
 const getSubscribedChannels = asyncHandler(async (req, res) => {
-    const { subscriberId } = req.params
-
-    if (!subscriberId) {
-        throw new ApiError(400, "Subscriber ID is required")
+    const { channelId } = req.params
+    
+    if (!channelId) {
+        throw new ApiError(400, "Channel ID is required")
     }
 
-    const user = await User.findById(subscriberId)
+    const channels = await Subscription.find({ channel: channelId })
 
-    if (!user) {
-        throw new ApiError(404, "User not found")
-    }
-
-    const subscriptions = await Subscription.findMany({ subscriber: subscriberId })
-
-    if(!subscriptions || subscriptions.length === 0) {
+    if (!channels || channels.length === 0) {
         throw new ApiError(404, "No subscriptions found")
     }
 
@@ -109,7 +94,7 @@ const getSubscribedChannels = asyncHandler(async (req, res) => {
         .status(200)
         .json(new ApiResponse(
             200,
-            subscriptions,
+            channels,
             "Subscribed channels fetched successfully"
         ))
 
