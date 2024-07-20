@@ -42,7 +42,7 @@ const getUserPlaylists = asyncHandler(async (req, res) => {
     // get all playlists where owner id matches user id
     // return response with playlist data
 
-    const playlists = await Playlist.findMany({ owner: new mongoose.Types.ObjectId(userId) })
+    const playlists = await Playlist.find({ owner: userId })
 
     if (!playlists || !playlists.length) {
         throw new ApiError(404, "No playlists found for this user")
@@ -171,6 +171,7 @@ const deletePlaylist = asyncHandler(async (req, res) => {
 const updatePlaylist = asyncHandler(async (req, res) => {
     const { playlistId } = req.params
     const { name, description } = req.body
+
     // update playlist
 
     if (!playlistId) {
