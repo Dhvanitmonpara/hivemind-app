@@ -1,6 +1,5 @@
 import mongoose, { isValidObjectId } from "mongoose"
 import { Video } from "../models/video.model.js"
-import { User } from "../models/user.model.js"
 import { ApiError } from "../utils/ApiError.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import { asyncHandler } from "../utils/asyncHandler.js"
@@ -10,7 +9,7 @@ import getPublicId from "../utils/getPublicId.js"
 
 const getAllVideos = asyncHandler(async (req, res) => {
     const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
-    //TODO: get all videos based on query, sort, pagination
+    // get all videos based on query, sort, pagination
 
     const validSortFields = ["createdAt", "title"];
     const validSortTypes = ["asc", "desc"];
@@ -206,8 +205,6 @@ const getVideoById = asyncHandler(async (req, res) => {
 
 const updateVideo = asyncHandler(async (req, res) => {
 
-    // FIXME: thumbnail is not updating
-
     const { videoId } = req.params
 
     if (!videoId) {
@@ -218,19 +215,23 @@ const updateVideo = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Invalid video ID")
     }
 
-    const { thumbnail, title, description } = req.body
+    const { title, description } = req.body
+
+    const thumbnailLocalPath = req.file?.path
 
     let updatedVideo
 
-    if (thumbnail) {
+    if (thumbnailLocalPath) {
 
-        const thumbnailOldPath = await Video.findById(videoId).select("thumbnail").lean()
+        const rawThumbnailOldPath = await Video.findById(videoId).select("thumbnail").lean()
 
-        if (thumbnailOldPath?.thumbnail) {
-            await deleteFromCloudinary(thumbnailOldPath.thumbnail)
+        const thumbnailOldPath = await getPublicId(rawThumbnailOldPath.thumbnail)
+
+        console.log(thumbnailOldPath)
+
+        if (thumbnailOldPath) {
+            await deleteFromCloudinary(thumbnailOldPath, "image")
         }
-
-        const thumbnailLocalPath = req.files?.thumbnail?.[0].path
 
         const thumbnailOnCloudinary = await uploadOnCloudinary(thumbnailLocalPath)
 
@@ -238,18 +239,25 @@ const updateVideo = asyncHandler(async (req, res) => {
             throw new ApiError(500, "Failed to upload thumbnail")
         }
 
-        updatedVideo = await Video.findByIdAndUpdate(videoId,
+        updatedVideo = await Video.findByIdAndUpdate(
+            {
+                _id: videoId,
+                owner: req.user._id,
+            },
             {
                 title,
                 description,
-                thumbnail: thumbnail?.url,
+                thumbnail: thumbnailOnCloudinary?.url,
             },
             { new: true })
 
     } else {
 
         updatedVideo = await Video.findByIdAndUpdate(
-            videoId,
+            {
+                _id: videoId,
+                owner: req.user._id,
+            },
             {
                 title,
                 description,
