@@ -14,21 +14,15 @@ const toggleSubscription = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Channel ID is required")
     }
 
-    const channel = await User.findById(channelId)
-
-    if (!channel) {
-        throw new ApiError(404, "Channel not found")
-    }
-
     const isSubscribed = await Subscription.findOne({
         subscriber: req.user._id,
-        channel: channel._id
+        channel: channelId
     })
 
     if (!isSubscribed) {
         const subscription = await Subscription.create({
             subscriber: req.user._id,
-            channel: channel._id,
+            channel: channelId,
         })
 
         return res.status(201).json(new ApiResponse(
