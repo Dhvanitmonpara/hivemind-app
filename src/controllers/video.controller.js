@@ -319,19 +319,13 @@ const togglePublishStatus = asyncHandler(async (req, res) => {
 
     const authenticatedId = req.user?._id;
 
-    const { isPublished } = req.body;
-
-    console.log(req.body)
-
-    console.log(isPublished)
-
     const video = await Video.findByIdAndUpdate(
         {
             _id: videoId,
             owner: authenticatedId
         },
         {
-            isPublished: !isPublished
+            isPublished: !req.body.isPublished
         },
         { new: true }
     );
